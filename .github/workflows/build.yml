@@ -32,10 +32,15 @@ jobs:
           xmlto \
           automake \
           gcc-aarch64-linux-gnu \
-          gcc-x86-64-linux-gnu \
+          g++-aarch64-linux-gnu \
+          libc6-dev-arm64-cross \
           libmnl-dev \
           libnfnetlink-dev \
-          linux-headers-$(uname -r)
+          libxtables-dev \
+          libip6tc-dev \
+          libip4tc-dev \
+          libnetfilter-conntrack-dev \
+          libnetfilter-queue-dev
 
     - name: Build
       run: |
