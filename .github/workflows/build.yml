@@ -14,11 +14,6 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v2
-      with:
-        platforms: linux/amd64,linux/arm64
-
     - name: Install Dependencies
       run: |
         sudo apt-get update
@@ -35,19 +30,9 @@ jobs:
         strip src/obfs-server
         mv src/obfs-server src/obfs-server-x86_64
 
-    - name: Build aarch64 Binary
-      run: |
-        git submodule update --init --recursive
-        ./autogen.sh
-        ./configure --host=aarch64-linux-gnu
-        make
-        strip src/obfs-server
-        mv src/obfs-server src/obfs-server-aarch64
-
     - name: Upload Release
       uses: softprops/action-gh-release@v0.1.15
       with:
         tag_name: ${{ github.ref_name }}
         files: |
           src/obfs-server-x86_64
-          src/obfs-server-aarch64
