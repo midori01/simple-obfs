@@ -14,18 +14,17 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
+      with:
+        platforms: linux/amd64,linux/arm64
+
     - name: Install Dependencies
       run: |
         sudo apt-get update
         sudo apt-get install --no-install-recommends -y \
           build-essential autoconf libtool libssl-dev \
-          libpcre3-dev libev-dev asciidoc xmlto automake \
-          qemu-user-static
-
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v2
-      with:
-        platforms: arm64
+          libpcre3-dev libev-dev asciidoc xmlto automake
 
     - name: Build x86_64 Binary
       run: |
