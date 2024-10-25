@@ -20,19 +20,29 @@ jobs:
         sudo apt-get install --no-install-recommends -y \
           build-essential autoconf libtool libssl-dev \
           libpcre3-dev libev-dev asciidoc xmlto automake \
-          gcc-x86-64-linux-gnu g++-x86-64-linux-gnu
+          gcc-x86-64-linux-gnu g++-x86-64-linux-gnu \
+          qemu-user-static
 
-    - name: Build
+    - name: Build x86_64 Binary
       run: |
         git submodule update --init --recursive
         ./autogen.sh
         ./configure --host=x86_64-linux-gnu && make
+        strip src/obfs-server
+        mv src/obfs-server src/obfs-server-x86_64
 
-    - name: Strip
-      run: strip src/obfs-server
+    - name: Build aarch64 Binary
+      run: |
+        git submodule update --init --recursive
+        ./autogen.sh
+        ./configure --host=aarch64-linux-gnu && make
+        strip src/obfs-server
+        mv src/obfs-server src/obfs-server-aarch64
 
     - name: Upload Release
       uses: softprops/action-gh-release@v0.1.15
       with:
         tag_name: ${{ github.ref_name }}
-        files: src/obfs-server
+        files: |
+          src/obfs-server-x86_64
+          src/obfs-server-aarch64
