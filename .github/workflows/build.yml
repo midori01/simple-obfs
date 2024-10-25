@@ -22,33 +22,41 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install --no-install-recommends -y \
-          linux-headers-$(uname -r) \
           build-essential \
           autoconf \
           libtool \
           libssl-dev \
           libpcre3-dev \
           libev-dev \
-          libmnl-dev \
-          libnfnetlink-dev \
           asciidoc \
           xmlto \
           automake \
           musl-tools \
+          libmnl-dev \
+          libnfnetlink-dev \
+          linux-headers-$(uname -r) \
+          iptables-dev \
           libnetfilter-conntrack-dev \
-          libnetfilter-queue-dev
+          libnetfilter-queue-dev \
+          libxt-dev \
+          libip6tc-dev \
+          libnetfilter-acct-dev \
+          libnetfilter-log-dev
 
     - name: Build
       run: |
         set -eux
         if [ "${{ matrix.arch }}" = "aarch64" ]; then
           export CC="aarch64-linux-musl-gcc"
+          export CXX="aarch64-linux-musl-g++"
         else
           export CC="x86_64-linux-musl-gcc"
+          export CXX="x86_64-linux-musl-g++"
         fi
         git submodule update --init --recursive
         ./autogen.sh
-        ./configure --host=${{ matrix.arch }}-linux-musl && make
+        ./configure --host=${{ matrix.arch }}-linux-musl
+        make
 
     - name: Strip
       run: strip src/obfs-server
