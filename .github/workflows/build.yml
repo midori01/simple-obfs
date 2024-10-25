@@ -26,8 +26,7 @@ jobs:
       run: |
         git submodule update --init --recursive
         ./autogen.sh
-        ./configure --host=x86_64-linux-gnu
-        make
+        ./configure --host=x86_64-linux-gnu && make
 
     - name: Strip
       run: strip src/obfs-server
@@ -37,4 +36,3 @@ jobs:
       with:
         tag_name: ${{ github.ref_name }}
         files: src/obfs-server
-        name: obfs-server-${{ github.ref_name }}
