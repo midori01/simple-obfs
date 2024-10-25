@@ -18,8 +18,9 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Install
+    - name: Install Dependencies
       run: |
+        set -eux
         sudo apt-get update
         sudo apt-get install --no-install-recommends -y \
           build-essential \
@@ -57,7 +58,6 @@ jobs:
           export CXX="x86_64-linux-gnu-g++"
           export TARGET_ARCH="x86_64"
         fi
-        
         git submodule update --init --recursive
         ./autogen.sh
         ./configure --host=${{ matrix.arch }}-linux-gnu
