@@ -20,20 +20,13 @@ jobs:
         sudo apt-get install --no-install-recommends -y \
           build-essential autoconf libtool libssl-dev \
           libpcre3-dev libev-dev asciidoc xmlto automake \
-          musl-tools \
-          libmnl-dev \
-          libnfnetlink-dev \
-          libxtables-dev \
-          libip6tc-dev \
-          libip4tc-dev \
-          libnetfilter-conntrack-dev \
-          libnetfilter-queue-dev
+          gcc-x86-64-linux-gnu g++-x86-64-linux-gnu
 
     - name: Build
       run: |
         git submodule update --init --recursive
         ./autogen.sh
-        ./configure --host=x86_64-linux-musl
+        ./configure --host=x86_64-linux-gnu
         make
 
     - name: Strip
