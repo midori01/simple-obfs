@@ -20,7 +20,14 @@ jobs:
         sudo apt-get install --no-install-recommends -y \
           build-essential autoconf libtool libssl-dev \
           libpcre3-dev libev-dev asciidoc xmlto automake \
-          musl-tools
+          musl-tools \
+          libmnl-dev \
+          libnfnetlink-dev \
+          libxtables-dev \
+          libip6tc-dev \
+          libip4tc-dev \
+          libnetfilter-conntrack-dev \
+          libnetfilter-queue-dev
 
     - name: Build
       run: |
