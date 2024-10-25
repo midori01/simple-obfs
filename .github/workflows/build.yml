@@ -25,8 +25,7 @@ jobs:
       run: |
         git submodule update --init --recursive
         ./autogen.sh
-        ./configure --host=x86_64-linux-gnu
-        make
+        ./configure && make
         strip src/obfs-server
         mv src/obfs-server src/obfs-server-x86_64
 
