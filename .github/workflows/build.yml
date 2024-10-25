@@ -22,13 +22,14 @@ jobs:
       run: |
         set -eux
         sudo apt-get update
+        sudo dpkg --add-architecture arm64
+        sudo apt-get update
         sudo apt-get install --no-install-recommends -y \
           build-essential \
           autoconf \
           libtool \
           libssl-dev \
           libpcre3-dev \
-          libev-dev \
           asciidoc \
           xmlto \
           automake \
@@ -44,7 +45,8 @@ jobs:
           libip6tc-dev \
           libip4tc-dev \
           libnetfilter-conntrack-dev \
-          libnetfilter-queue-dev
+          libnetfilter-queue-dev \
+          libev-dev:arm64
 
     - name: Build
       run: |
@@ -58,6 +60,7 @@ jobs:
           export CXX="x86_64-linux-gnu-g++"
           export TARGET_ARCH="x86_64"
         fi
+
         git submodule update --init --recursive
         ./autogen.sh
         ./configure --host=${{ matrix.arch }}-linux-gnu
