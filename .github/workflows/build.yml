@@ -1,0 +1,56 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        arch: [x86_64, aarch64]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install --no-install-recommends -y \
+          build-essential \
+          autoconf \
+          libtool \
+          libssl-dev \
+          libpcre3-dev \
+          libev-dev \
+          asciidoc \
+          xmlto \
+          automake \
+          musl-tools
+
+    - name: Build
+      run: |
+        set -eux
+        if [ "${{ matrix.arch }}" = "aarch64" ]; then
+          export CC="aarch64-linux-musl-gcc"
+        else
+          export CC="x86_64-linux-musl-gcc"
+        fi
+        git submodule update --init --recursive
+        ./autogen.sh
+        ./configure --host=${{ matrix.arch }}-linux-musl && make
+
+    - name: Strip
+      run: strip src/obfs-server
+
+    - name: Upload Release
+      uses: softprops/action-gh-release@v0.1.15
+      with:
+        tag_name: ${{ github.ref_name }}
+        files: src/obfs-server
+        name: obfs-server-${{ matrix.arch }}-${{ github.ref_name }}
