@@ -28,6 +28,8 @@ jobs:
           libssl-dev \
           libpcre3-dev \
           libev-dev \
+          libmnl-dev \
+          libnfnetlink-dev \
           asciidoc \
           xmlto \
           automake \
