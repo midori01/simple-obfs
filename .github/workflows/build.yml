@@ -31,38 +31,25 @@ jobs:
           asciidoc \
           xmlto \
           automake \
-          musl-tools \
+          gcc-aarch64-linux-gnu \
+          gcc-x86-64-linux-gnu \
           libmnl-dev \
           libnfnetlink-dev \
-          linux-headers-$(uname -r) \
-          libxtables-dev \
-          libip6tc-dev \
-          libip4tc-dev \
-          libnetfilter-conntrack-dev \
-          libnetfilter-queue-dev \
-          libxt-dev \
-          libip6tc-dev \
-          libnetfilter-acct-dev \
-          libnetfilter-log-dev
+          linux-headers-$(uname -r)
 
-    - name: Check Compiler
-      run: |
-        aarch64-linux-musl-gcc --version
-        x86_64-linux-musl-gcc --version
-
-    - name: Build simple-obfs for ${{ matrix.arch }}
+    - name: Build
       run: |
         set -eux
         if [ "${{ matrix.arch }}" = "aarch64" ]; then
-          export CC="aarch64-linux-musl-gcc"
-          export CXX="aarch64-linux-musl-g++"
+          export CC="aarch64-linux-gnu-gcc"
+          export CXX="aarch64-linux-gnu-g++"
         else
-          export CC="x86_64-linux-musl-gcc"
-          export CXX="x86_64-linux-musl-g++"
+          export CC="x86_64-linux-gnu-gcc"
+          export CXX="x86_64-linux-gnu-g++"
         fi
         git submodule update --init --recursive
         ./autogen.sh
-        ./configure --host=${{ matrix.arch }}-linux-musl
+        ./configure --host=${{ matrix.arch }}-linux-gnu
         make
 
     - name: Strip
