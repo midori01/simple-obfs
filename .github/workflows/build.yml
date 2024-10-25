@@ -20,8 +20,12 @@ jobs:
         sudo apt-get install --no-install-recommends -y \
           build-essential autoconf libtool libssl-dev \
           libpcre3-dev libev-dev asciidoc xmlto automake \
-          gcc-x86-64-linux-gnu g++-x86-64-linux-gnu \
           qemu-user-static
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
+      with:
+        platforms: arm64
 
     - name: Build x86_64 Binary
       run: |
