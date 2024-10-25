@@ -34,7 +34,9 @@ jobs:
           asciidoc \
           xmlto \
           automake \
-          musl-tools
+          musl-tools \
+          libnetfilter-conntrack-dev \
+          libnetfilter-queue-dev
 
     - name: Build
       run: |
