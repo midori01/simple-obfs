@@ -35,7 +35,9 @@ jobs:
           libmnl-dev \
           libnfnetlink-dev \
           linux-headers-$(uname -r) \
-          iptables-dev \
+          libxtables-dev \
+          libip6tc-dev \
+          libip4tc-dev \
           libnetfilter-conntrack-dev \
           libnetfilter-queue-dev \
           libxt-dev \
@@ -43,7 +45,12 @@ jobs:
           libnetfilter-acct-dev \
           libnetfilter-log-dev
 
-    - name: Build
+    - name: Check Compiler
+      run: |
+        aarch64-linux-musl-gcc --version
+        x86_64-linux-musl-gcc --version
+
+    - name: Build simple-obfs for ${{ matrix.arch }}
       run: |
         set -eux
         if [ "${{ matrix.arch }}" = "aarch64" ]; then
