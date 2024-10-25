@@ -10,60 +10,23 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        arch: [x86_64, aarch64]
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
 
     - name: Install Dependencies
       run: |
-        set -eux
-        sudo apt-get update
-        sudo dpkg --add-architecture arm64
         sudo apt-get update
         sudo apt-get install --no-install-recommends -y \
-          build-essential \
-          autoconf \
-          libtool \
-          libssl-dev \
-          libpcre3-dev \
-          asciidoc \
-          xmlto \
-          automake \
-          gcc-aarch64-linux-gnu \
-          g++-aarch64-linux-gnu \
-          gcc-x86-64-linux-gnu \
-          g++-x86-64-linux-gnu \
-          libc6-dev-arm64-cross \
-          libc6-dev-amd64-cross \
-          libmnl-dev \
-          libnfnetlink-dev \
-          libxtables-dev \
-          libip6tc-dev \
-          libip4tc-dev \
-          libnetfilter-conntrack-dev \
-          libnetfilter-queue-dev \
-          libev-dev:arm64
+          build-essential autoconf libtool libssl-dev \
+          libpcre3-dev libev-dev asciidoc xmlto automake \
+          musl-tools
 
     - name: Build
       run: |
-        set -eux
-        if [ "${{ matrix.arch }}" = "aarch64" ]; then
-          export CC="aarch64-linux-gnu-gcc"
-          export CXX="aarch64-linux-gnu-g++"
-          export TARGET_ARCH="aarch64"
-        else
-          export CC="x86_64-linux-gnu-gcc"
-          export CXX="x86_64-linux-gnu-g++"
-          export TARGET_ARCH="x86_64"
-        fi
-
         git submodule update --init --recursive
         ./autogen.sh
-        ./configure --host=${{ matrix.arch }}-linux-gnu
+        ./configure --host=x86_64-linux-musl
         make
 
     - name: Strip
@@ -74,4 +37,4 @@ jobs:
       with:
         tag_name: ${{ github.ref_name }}
         files: src/obfs-server
-        name: obfs-server-${{ matrix.arch }}-${{ github.ref_name }}
+        name: obfs-server-${{ github.ref_name }}
