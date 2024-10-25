@@ -14,7 +14,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Setup QEMU
+    - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
       with:
         platforms: linux/amd64,linux/arm64
@@ -26,18 +26,23 @@ jobs:
           build-essential autoconf libtool libssl-dev \
           libpcre3-dev libev-dev asciidoc xmlto automake
 
-    - name: Build Binaries
+    - name: Build x86_64 Binary
       run: |
         git submodule update --init --recursive
         ./autogen.sh
-        architectures=("x86_64" "aarch64")       
-        for arch in "${architectures[@]}"; do
-          ./configure --host=${arch}-linux-gnu
-          make
-          strip src/obfs-server
-          mv src/obfs-server "src/obfs-server-${arch}"
-          make clean
-        done
+        ./configure --host=x86_64-linux-gnu
+        make
+        strip src/obfs-server
+        mv src/obfs-server src/obfs-server-x86_64
+
+    - name: Build aarch64 Binary
+      run: |
+        git submodule update --init --recursive
+        ./autogen.sh
+        ./configure --host=aarch64-linux-gnu
+        make
+        strip src/obfs-server
+        mv src/obfs-server src/obfs-server-aarch64
 
     - name: Upload Release
       uses: softprops/action-gh-release@v0.1.15
