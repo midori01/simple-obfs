@@ -18,24 +18,24 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - name: Checkout Repository
+    - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Install Dependencies
+    - name: Install
       run: |
         sudo apt-get update
         sudo apt-get install --no-install-recommends -y \
           build-essential autoconf libtool libssl-dev \
           libpcre3-dev libev-dev asciidoc xmlto automake
 
-    - name: Build Binary
+    - name: Build
       run: |
         git submodule update --init --recursive
         ./autogen.sh
         ./configure && make
         strip src/obfs-server
 
-    - name: Upload Binary
+    - name: Upload
       uses: actions/upload-artifact@v3
       with:
         name: obfs-server-${{ matrix.arch }}
@@ -46,13 +46,19 @@ jobs:
     needs: build
 
     steps:
-    - name: Download Binary
+    - name: Download
       uses: actions/download-artifact@v3
       with:
         path: src/
 
-    - name: Upload Release
+    - name: Move
+      run: |
+        mkdir -p src/release
+        mv src/obfs-server-aarch64/obfs-server src/release/obfs-server-aarch64
+        mv src/obfs-server-x86_64/obfs-server src/release/obfs-server-x86_64
+
+    - name: Release
       uses: softprops/action-gh-release@v0.1.15
       with:
         tag_name: ${{ github.ref_name }}
-        files: src/*
+        files: src/release/*
