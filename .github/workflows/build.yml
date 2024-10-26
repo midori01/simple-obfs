@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build_x86_64:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,11 +21,6 @@ jobs:
           build-essential autoconf libtool libssl-dev \
           libpcre3-dev libev-dev asciidoc xmlto automake
 
-    - name: Setup QEMU
-      uses: docker/setup-qemu-action@v2
-      with:
-        platforms: arm64
-
     - name: Build x86_64 Binary
       run: |
         git submodule update --init --recursive
@@ -34,20 +29,57 @@ jobs:
         strip src/obfs-server
         mv src/obfs-server src/obfs-server-x86_64
 
+    - name: Upload x86_64 Binary
+      uses: actions/upload-artifact@v3
+      with:
+        name: obfs-server-x86_64
+        path: src/obfs-server-x86_64
+
+  build_aarch64:
+    runs-on: oracle-nrt2
+    needs: build_x86_64
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install --no-install-recommends -y \
+          build-essential autoconf libtool libssl-dev \
+          libpcre3-dev libev-dev asciidoc xmlto automake
+
     - name: Build aarch64 Binary
       run: |
         git submodule update --init --recursive
-        docker run --rm --platform linux/arm64 \
-          -v ${{ github.workspace }}:/workspace \
-          -w /workspace \
-          ubuntu:latest \
-          bash -c "
-            apt-get update && \
-            apt-get install -y build-essential autoconf libtool libssl-dev libpcre3-dev libev-dev asciidoc xmlto automake && \
-            ./autogen.sh && ./configure && make && \
-            strip src/obfs-server && \
-            mv src/obfs-server src/obfs-server-aarch64
-          "
+        ./autogen.sh
+        ./configure && make
+        strip src/obfs-server
+        mv src/obfs-server src/obfs-server-aarch64
+
+    - name: Upload aarch64 Binary
+      uses: actions/upload-artifact@v3
+      with:
+        name: obfs-server-aarch64
+        path: src/obfs-server-aarch64
+
+  release:
+    runs-on: ubuntu-latest
+    needs: [build_x86_64, build_aarch64]
+
+    steps:
+    - name: Download Binaries
+      uses: actions/download-artifact@v3
+      with:
+        name: obfs-server-x86_64
+        path: src/
+    
+    - name: Download aarch64 Binary
+      uses: actions/download-artifact@v3
+      with:
+        name: obfs-server-aarch64
+        path: src/
 
     - name: Upload Release
       uses: softprops/action-gh-release@v0.1.15
