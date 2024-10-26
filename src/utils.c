@@ -247,7 +247,7 @@ ss_realloc(void *ptr, size_t new_size)
 void
 usage()
 {
-    printf("simple-obfs %s\n\n", VERSION);
+    printf("simple-obfs %s\n", VERSION);
 }
 
 void
