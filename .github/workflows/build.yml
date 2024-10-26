@@ -55,4 +55,4 @@ jobs:
       uses: softprops/action-gh-release@v0.1.15
       with:
         tag_name: ${{ github.ref_name }}
-        files: src/obfs-server-*
+        files: src/*
