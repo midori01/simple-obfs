@@ -21,23 +21,21 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Install musl and dependencies
+    - name: Install
       run: |
         sudo apt-get update
         sudo apt-get install --no-install-recommends -y \
-          musl musl-dev musl-tools \
-          build-essential autoconf libtool \
-          libpcre3-dev asciidoc xmlto automake
+          build-essential autoconf libtool libssl-dev \
+          libpcre3-dev libev-dev asciidoc xmlto automake
 
-    - name: Build (Static)
+    - name: Build
       run: |
         git submodule update --init --recursive
-        CC=musl-gcc ./autogen.sh
-        CC=musl-gcc ./configure LDFLAGS="-static" --enable-static
-        make
+        ./autogen.sh
+        ./configure && make
         strip src/obfs-server
 
-    - name: Upload Artifact
+    - name: Upload
       uses: actions/upload-artifact@v3
       with:
         name: obfs-server-${{ matrix.arch }}
@@ -48,18 +46,18 @@ jobs:
     needs: build
 
     steps:
-    - name: Download Artifacts
+    - name: Download
       uses: actions/download-artifact@v3
       with:
         path: src/
 
-    - name: Prepare Release
+    - name: Move
       run: |
         mkdir -p src/release
         mv src/obfs-server-aarch64/obfs-server src/release/obfs-server-aarch64
         mv src/obfs-server-x86_64/obfs-server src/release/obfs-server-x86_64
 
-    - name: Create GitHub Release
+    - name: Release
       uses: softprops/action-gh-release@v0.1.15
       with:
         tag_name: ${{ github.ref_name }}
