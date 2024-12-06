@@ -21,18 +21,19 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Install Dependencies
+    - name: Install musl and dependencies
       run: |
         sudo apt-get update
         sudo apt-get install --no-install-recommends -y \
-          build-essential autoconf libtool libssl-dev \
-          libpcre3-dev libev-dev asciidoc xmlto automake
+          musl musl-dev musl-tools \
+          build-essential autoconf libtool \
+          libpcre3-dev asciidoc xmlto automake
 
-    - name: Build
+    - name: Build (Static)
       run: |
         git submodule update --init --recursive
-        ./autogen.sh
-        ./configure --enable-static LDFLAGS="-static"
+        CC=musl-gcc ./autogen.sh
+        CC=musl-gcc ./configure LDFLAGS="-static" --enable-static
         make
         strip src/obfs-server
 
