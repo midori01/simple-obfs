@@ -28,20 +28,27 @@ jobs:
           autoconf automake libtool build-essential \
           asciidoc xmlto wget
 
+    - name: Install Static glibc
+      run: |
+        wget https://github.com/static-linux/static-glibc/releases/download/2.35-1/static-glibc-2.35-1-${{ matrix.arch }}.tar.gz
+        mkdir -p /opt/static-glibc
+        tar -xzf static-glibc-2.35-1-${{ matrix.arch }}.tar.gz -C /opt/static-glibc
+        export PATH=/opt/static-glibc/bin:$PATH
+
     - name: Build Static libev
       run: |
         wget https://dist.schmorp.de/libev/Attic/libev-4.33.tar.gz
         tar -xzf libev-4.33.tar.gz
         cd libev-4.33
-        ./configure --enable-static --disable-shared
+        ./configure CC=/opt/static-glibc/bin/gcc --enable-static --disable-shared
         make
         sudo make install
 
-    - name: Build obfs-server
+    - name: Build Binary
       run: |
         git submodule update --init --recursive
         ./autogen.sh
-        ./configure --prefix=/usr --enable-static --disable-shared \
+        ./configure CC=/opt/static-glibc/bin/gcc --prefix=/usr --enable-static --disable-shared \
             LDFLAGS="-static -L/usr/local/lib" \
             CPPFLAGS="-I/usr/local/include"
         make
