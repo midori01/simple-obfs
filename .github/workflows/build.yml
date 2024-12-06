@@ -25,17 +25,25 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install --no-install-recommends -y \
-          autoconf automake libtool libev-dev asciidoc xmlto \
-          build-essential
+          autoconf automake libtool build-essential \
+          asciidoc xmlto wget
 
-    - name: Prepare Sources
+    - name: Build Static libev
+      run: |
+        wget https://dist.schmorp.de/libev/Attic/libev-4.33.tar.gz
+        tar -xzf libev-4.33.tar.gz
+        cd libev-4.33
+        ./configure --enable-static --disable-shared
+        make
+        sudo make install
+
+    - name: Build obfs-server
       run: |
         git submodule update --init --recursive
         ./autogen.sh
-
-    - name: Build
-      run: |
-        ./configure --prefix=/usr --enable-static --disable-shared LDFLAGS="-static"
+        ./configure --prefix=/usr --enable-static --disable-shared \
+            LDFLAGS="-static -L/usr/local/lib" \
+            CPPFLAGS="-I/usr/local/include"
         make
         strip src/obfs-server
 
