@@ -21,21 +21,25 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Install
+    - name: Install Dependencies
       run: |
         sudo apt-get update
         sudo apt-get install --no-install-recommends -y \
-          build-essential autoconf libtool libssl-dev \
-          libpcre3-dev libev-dev asciidoc xmlto automake
+          autoconf automake libtool libev-dev asciidoc xmlto \
+          build-essential
 
-    - name: Build
+    - name: Prepare Sources
       run: |
         git submodule update --init --recursive
         ./autogen.sh
-        ./configure && make
+
+    - name: Build
+      run: |
+        ./configure --prefix=/usr --enable-static --disable-shared LDFLAGS="-static"
+        make
         strip src/obfs-server
 
-    - name: Upload
+    - name: Upload Artifact
       uses: actions/upload-artifact@v3
       with:
         name: obfs-server-${{ matrix.arch }}
@@ -46,18 +50,18 @@ jobs:
     needs: build
 
     steps:
-    - name: Download
+    - name: Download Artifacts
       uses: actions/download-artifact@v3
       with:
         path: src/
 
-    - name: Move
+    - name: Prepare Release
       run: |
         mkdir -p src/release
         mv src/obfs-server-aarch64/obfs-server src/release/obfs-server-aarch64
         mv src/obfs-server-x86_64/obfs-server src/release/obfs-server-x86_64
 
-    - name: Release
+    - name: Create GitHub Release
       uses: softprops/action-gh-release@v0.1.15
       with:
         tag_name: ${{ github.ref_name }}
