@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-20.04
             arch: x86_64
           - os: ARM64
             arch: aarch64
@@ -21,7 +21,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Install
+    - name: Install dependencies
       run: |
         sudo apt-get update
         sudo apt-get install --no-install-recommends -y \
@@ -37,29 +37,29 @@ jobs:
         ./configure --prefix=/usr --disable-documentation && make
         strip src/obfs-server
 
-    - name: Upload
+    - name: Upload build artifact
       uses: actions/upload-artifact@v3
       with:
         name: obfs-server-${{ matrix.arch }}
         path: src/obfs-server
 
   release:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: build
 
     steps:
-    - name: Download
+    - name: Download artifact
       uses: actions/download-artifact@v3
       with:
         path: src/
 
-    - name: Move
+    - name: Move and prepare release
       run: |
         mkdir -p src/release
         mv src/obfs-server-aarch64/obfs-server src/release/obfs-server-aarch64
         mv src/obfs-server-x86_64/obfs-server src/release/obfs-server-x86_64
 
-    - name: Release
+    - name: Create GitHub release
       uses: softprops/action-gh-release@v0.1.15
       with:
         tag_name: ${{ github.ref_name }}
