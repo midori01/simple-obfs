@@ -21,19 +21,25 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Install
+    - name: Install dependencies
       run: |
         sudo apt-get update
         sudo apt-get install --no-install-recommends -y \
           build-essential autoconf libtool libssl-dev \
-          libpcre3-dev libev-dev asciidoc xmlto automake
+          libpcre3-dev libev-dev asciidoc xmlto automake \
+          gcc-7 g++-7 wget curl
+
+    - name: Install GCC 7
+      run: |
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 100
+        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 100
 
     - name: Build
       run: |
         git submodule update --init --recursive
         ./autogen.sh
         export LIBS="-lpthread -lm"
-        export LDFLAGS="-Wl,-static -static -static-libgcc -no-pie"
+        export LDFLAGS="-Wl,-static -static-libgcc -static-libstdc++ -no-pie"
         ./configure --prefix=/usr --disable-documentation && make
         strip src/obfs-server
 
