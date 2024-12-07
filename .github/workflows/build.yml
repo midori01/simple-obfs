@@ -21,10 +21,13 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
+    - name: Remove problematic PPA
+      run: |
+        sudo add-apt-repository --remove ppa:ubuntu-toolchain-r/test
+        sudo apt-get update
+
     - name: Install dependencies
       run: |
-        sudo apt-get update
-        sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 2C277A0A352154E5 1E9377A2BA9EF27F
         sudo apt-get install --no-install-recommends -y \
           build-essential autoconf libtool libssl-dev \
           libpcre3-dev libev-dev asciidoc xmlto automake
