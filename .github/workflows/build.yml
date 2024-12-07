@@ -32,7 +32,9 @@ jobs:
       run: |
         git submodule update --init --recursive
         ./autogen.sh
-        ./configure && make
+        export LIBS="-lpthread -lm"
+        export LDFLAGS="-Wl,-static -static -static-libgcc -no-pie"
+        ./configure --prefix=/usr --disable-documentation && make
         strip src/obfs-server
 
     - name: Upload
