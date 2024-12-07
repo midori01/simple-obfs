@@ -27,12 +27,12 @@ jobs:
         sudo apt-get install --no-install-recommends -y \
           build-essential autoconf libtool libssl-dev \
           libpcre3-dev libev-dev asciidoc xmlto automake \
-          gcc-7 g++-7 wget curl
+          gcc-8 g++-8 wget curl
 
-    - name: Install GCC 7
+    - name: Install GCC 8
       run: |
-        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 100
-        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 100
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 100
+        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 100
 
     - name: Build
       run: |
