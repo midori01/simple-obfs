@@ -27,19 +27,27 @@ jobs:
         sudo apt-get install --no-install-recommends -y \
           build-essential autoconf libtool libssl-dev \
           libpcre3-dev libev-dev asciidoc xmlto automake \
-          gcc-8 g++-8 wget curl
+          wget curl
 
-    - name: Install GCC 8
+    - name: Add PPA and Install GCC 8
       run: |
-        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 100
-        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 100
+        sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+        sudo apt-get update
+        sudo apt-get install gcc-8 g++-8
+
+    - name: Install GCC 8 if available
+      run: |
+        if [ -f /usr/bin/gcc-8 ]; then
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 100
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 100
+        fi
 
     - name: Build
       run: |
         git submodule update --init --recursive
         ./autogen.sh
         export LIBS="-lpthread -lm"
-        export LDFLAGS="-Wl,-static -static-libgcc -static-libstdc++ -no-pie"
+        export LDFLAGS="-Wl,-static -static -static-libgcc -static-libstdc++ -no-pie"
         ./configure --prefix=/usr --disable-documentation && make
         strip src/obfs-server
 
